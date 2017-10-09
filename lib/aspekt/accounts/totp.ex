@@ -7,18 +7,22 @@ defmodule Aspekt.Accounts.Totp do
   embedded_schema do
     field :secret_key, :binary
 		field :scratch_codes, {:array, :integer}
+    field :subject_id, :integer
   end
 
 	def changeset(%Totp{} = totp, attrs) do
     totp
-    |> cast(attrs, [:secret_key, :scratch_codes])
-    |> validate_required([:secret_key, :scratch_codes])
+    |> cast(attrs, [:subject_id, :secret_key, :scratch_codes])
+    |> validate_required([:subject_id, :secret_key, :scratch_codes])
   end
 
   def to_principal(%Totp{} = totp) do
     %Principal{
       data: "#{Base.encode32(totp.secret_key)};#{Enum.join(totp.scratch_codes,",")}",
-      kind: "totp"
+      kind: "totp",
+			sequence: nil,
+			subject_id: totp.subject_id,
+			id: totp.id
     }
   end
 

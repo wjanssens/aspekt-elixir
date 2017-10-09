@@ -20,12 +20,14 @@ defmodule Aspekt.Accounts.StructuredAddress do
     field :c, :string #country
 		field :label, :string
 		field :status, :string
+    field :sequence, :integer
+    field :subject_id, :integer
   end
 
 	def changeset(%StructuredAddress{} = address, attrs) do
 		address
-		|> cast(attrs, [:lines, :label, :status])
-		|> validate_required([:street, :l, :pc, :c, :status])
+		|> cast(attrs, [:subject_id, :sequence, :lines, :label, :status])
+		|> validate_required([:subject_id, :street, :l, :pc, :c, :status])
 		|> validate_inclusion(:label, ["home", "work", "other"])
 		|> validate_inclusion(:status, ["unverified", "valid", "invalid"])
 	end
@@ -33,7 +35,10 @@ defmodule Aspekt.Accounts.StructuredAddress do
 	def to_principal(%StructuredAddress{} = address) do
 		%Principal{
       data: DN.to_string(address),
-      kind: "full_address"
+      kind: "full_address",
+      sequence: address.sequence,
+      subject_id: address.subject_id,
+      id: address.id
     }
   end
 

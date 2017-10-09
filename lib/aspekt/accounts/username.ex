@@ -7,19 +7,23 @@ defmodule Aspekt.Accounts.Username do
 
   embedded_schema do
     field :username, :string
+    field :subject_id, :integer
   end
 
 	def changeset(%Username{} = username, attrs) do
 		username
-		|> cast(attrs, [:username])
-		|> validate_required([:username])
+		|> cast(attrs, [:subject_id, :username])
+		|> validate_required([:subject_id, :username])
 	end
 
   def to_principal(%Username{} = username) do
     %Principal{
       data: DN.to_string(%{username: username.username}),
       hash: :crypto.hash(:sha512, username.username),
-      kind: "username"
+      kind: "username",
+			sequence: nil,
+			subject_id: username.subject_id,
+			id: username.id
     }
   end
 

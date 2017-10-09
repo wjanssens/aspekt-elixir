@@ -9,12 +9,14 @@ defmodule Aspekt.Accounts.PostalAddress do
     field :lines, {:array, :string}
 		field :label, :string
 		field :status, :string
-  end
+		field :sequence, :integer
+		field :subject_id, :integer
+	end
 
 	def changeset(%PostalAddress{} = address, attrs) do
 		address
-		|> cast(attrs, [:lines, :label, :status])
-		|> validate_required([:lines, :status])
+		|> cast(attrs, [:subject_id, :sequence, :lines, :label, :status])
+		|> validate_required([:subject_id, :lines, :status])
 		|> validate_inclusion(:label, ["home", "work", "other"])
 		|> validate_inclusion(:status, ["unverified", "valid", "invalid"])
 	end
@@ -27,7 +29,10 @@ defmodule Aspekt.Accounts.PostalAddress do
 
     %Principal{
       data: DN.to_string(%{postalAddress: lines, label: address.label, status: address.status}),
-      kind: "postal_address"
+      kind: "postal_address",
+			sequence: address.sequence,
+			subject_id: address.subject_id,
+			id: address.id
     }
   end
 
